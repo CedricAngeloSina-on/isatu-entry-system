@@ -1,13 +1,15 @@
 "use client";
 
-import { cn } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { Label } from "~/components/ui/label";
 import Link from "next/link";
 import z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
+import { signIn } from "next-auth/react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 import {
   Form,
   FormControl,
@@ -25,13 +27,17 @@ const formSchema = z.object({
       /^[\w.-]+@(isatu\.edu\.ph|students\.isatu\.edu\.ph)$/,
       "Email must end with @isatu.edu.ph or @students.isatu.edu.ph",
     ),
-  password: z.string().nonempty(""),
+  password: z.string().min(1, "Password is required"),
 });
 
-export function LoginForm({
-  className,
-  ...props
-}: React.ComponentProps<"form">) {
+export function LoginForm() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Get the callback URL from search params or default to home
+  const callbackUrl = searchParams.get("callbackUrl") ?? "/dashboard";
+
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -42,10 +48,31 @@ export function LoginForm({
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
+
+    try {
+      const result = await signIn("credentials", {
+        email: values.email,
+        password: values.password,
+        redirect: false, // Don't redirect automatically, we'll handle it
+      });
+
+      if (result?.error) {
+        toast.error("Incorrect password!");
+      } else if (result?.ok) {
+        toast.success("Welcome back!");
+
+        // Redirect to the callback URL or dashboard
+        router.push(callbackUrl);
+        router.refresh(); // Refresh to update session state
+      }
+    } catch (error) {
+      toast.error("Something went wrong!");
+      console.error("Login error:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -54,7 +81,7 @@ export function LoginForm({
         <div className="flex flex-col gap-2">
           <h1 className="text-2xl font-bold">Login to your account</h1>
           <p className="text-muted-foreground text-sm text-balance">
-            Enter your ID number below to login to your account
+            Enter your email and password below to login to your account
           </p>
         </div>
 
@@ -66,7 +93,7 @@ export function LoginForm({
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input {...field} disabled={isSubmitting} type="email" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -81,15 +108,15 @@ export function LoginForm({
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input {...field} disabled={isSubmitting} type="password" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
-        <Button type="submit" className="mt-2 w-full">
-          Login
+        <Button type="submit" className="mt-2 w-full" disabled={isSubmitting}>
+          {isSubmitting ? "Logging in..." : "Login"}
         </Button>
         <div className="text-center text-sm">
           Don&apos;t have an account?{" "}

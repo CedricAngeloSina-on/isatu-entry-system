@@ -1,110 +1,98 @@
-import { relations, sql } from "drizzle-orm";
-import { index, pgTableCreator, primaryKey } from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
+import {
+  index,
+  integer,
+  primaryKey,
+  pgTable,
+  text,
+  varchar,
+  timestamp,
+} from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
 
-/**
- * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
- * database instance for multiple projects.
- *
- * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
- */
-export const createTable = pgTableCreator(
-  (name) => `isatu-entry-system_${name}`,
-);
+export const users = pgTable("user", {
+  id: varchar("id", { length: 255 }).notNull().primaryKey(),
+  name: varchar("name", { length: 255 }),
+  email: varchar("email", { length: 255 }).notNull(),
+  password: varchar("password", { length: 255 }),
+  emailVerified: timestamp("emailVerified", { mode: "date" }),
+  image: varchar("image", { length: 255 }),
 
-export const posts = createTable(
-  "post",
-  (d) => ({
-    id: d.integer().primaryKey().generatedByDefaultAsIdentity(),
-    name: d.varchar({ length: 256 }),
-    createdById: d
-      .varchar({ length: 255 })
-      .notNull()
-      .references(() => users.id),
-    createdAt: d
-      .timestamp({ withTimezone: true })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: d.timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
-  }),
-  (t) => [
-    index("created_by_idx").on(t.createdById),
-    index("name_idx").on(t.name),
-  ],
-);
+  // Additional fields from your registration form
+  firstName: varchar("firstName", { length: 255 }),
+  lastName: varchar("lastName", { length: 255 }),
+  role: varchar("role", { length: 255 }),
+  idNumber: varchar("idNumber", { length: 255 }),
+  college: varchar("college", { length: 255 }),
+  plateNumber: varchar("plateNumber", { length: 255 }),
+  vehicleType: varchar("vehicleType", { length: 255 }),
+});
 
-export const users = createTable("user", (d) => ({
-  id: d
-    .varchar({ length: 255 })
-    .notNull()
-    .primaryKey()
-    .$defaultFn(() => crypto.randomUUID()),
-  name: d.varchar({ length: 255 }),
-  email: d.varchar({ length: 255 }).notNull(),
-  emailVerified: d
-    .timestamp({
-      mode: "date",
-      withTimezone: true,
-    })
-    .default(sql`CURRENT_TIMESTAMP`),
-  image: d.varchar({ length: 255 }),
-}));
-
-export const usersRelations = relations(users, ({ many }) => ({
-  accounts: many(accounts),
-}));
-
-export const accounts = createTable(
+// Rest of your existing schema...
+export const accounts = pgTable(
   "account",
-  (d) => ({
-    userId: d
-      .varchar({ length: 255 })
+  {
+    userId: varchar("userId", { length: 255 })
       .notNull()
-      .references(() => users.id),
-    type: d.varchar({ length: 255 }).$type<AdapterAccount["type"]>().notNull(),
-    provider: d.varchar({ length: 255 }).notNull(),
-    providerAccountId: d.varchar({ length: 255 }).notNull(),
-    refresh_token: d.text(),
-    access_token: d.text(),
-    expires_at: d.integer(),
-    token_type: d.varchar({ length: 255 }),
-    scope: d.varchar({ length: 255 }),
-    id_token: d.text(),
-    session_state: d.varchar({ length: 255 }),
+      .references(() => users.id, { onDelete: "cascade" }),
+    type: varchar("type", { length: 255 })
+      .$type<AdapterAccount["type"]>()
+      .notNull(),
+    provider: varchar("provider", { length: 255 }).notNull(),
+    providerAccountId: varchar("providerAccountId", { length: 255 }).notNull(),
+    refresh_token: text("refresh_token"),
+    access_token: text("access_token"),
+    expires_at: integer("expires_at"),
+    token_type: varchar("token_type", { length: 255 }),
+    scope: varchar("scope", { length: 255 }),
+    id_token: text("id_token"),
+    session_state: varchar("session_state", { length: 255 }),
+  },
+  (account) => ({
+    compoundKey: primaryKey({
+      columns: [account.provider, account.providerAccountId],
+    }),
+    userIdIdx: index("account_userId_idx").on(account.userId),
   }),
-  (t) => [
-    primaryKey({ columns: [t.provider, t.providerAccountId] }),
-    index("account_user_id_idx").on(t.userId),
-  ],
+);
+
+export const sessions = pgTable(
+  "session",
+  {
+    sessionToken: varchar("sessionToken", { length: 255 })
+      .notNull()
+      .primaryKey(),
+    userId: varchar("userId", { length: 255 })
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    expires: timestamp("expires", { mode: "date" }).notNull(),
+  },
+  (session) => ({
+    userIdIdx: index("session_userId_idx").on(session.userId),
+  }),
+);
+
+export const verificationTokens = pgTable(
+  "verificationToken",
+  {
+    identifier: varchar("identifier", { length: 255 }).notNull(),
+    token: varchar("token", { length: 255 }).notNull(),
+    expires: timestamp("expires", { mode: "date" }).notNull(),
+  },
+  (vt) => ({
+    compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
+  }),
 );
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
   user: one(users, { fields: [accounts.userId], references: [users.id] }),
 }));
 
-export const sessions = createTable(
-  "session",
-  (d) => ({
-    sessionToken: d.varchar({ length: 255 }).notNull().primaryKey(),
-    userId: d
-      .varchar({ length: 255 })
-      .notNull()
-      .references(() => users.id),
-    expires: d.timestamp({ mode: "date", withTimezone: true }).notNull(),
-  }),
-  (t) => [index("t_user_id_idx").on(t.userId)],
-);
-
 export const sessionsRelations = relations(sessions, ({ one }) => ({
   user: one(users, { fields: [sessions.userId], references: [users.id] }),
 }));
 
-export const verificationTokens = createTable(
-  "verification_token",
-  (d) => ({
-    identifier: d.varchar({ length: 255 }).notNull(),
-    token: d.varchar({ length: 255 }).notNull(),
-    expires: d.timestamp({ mode: "date", withTimezone: true }).notNull(),
-  }),
-  (t) => [primaryKey({ columns: [t.identifier, t.token] })],
-);
+export const usersRelations = relations(users, ({ many }) => ({
+  accounts: many(accounts),
+  sessions: many(sessions),
+}));

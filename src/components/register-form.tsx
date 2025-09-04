@@ -3,6 +3,8 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { Button } from "~/components/ui/button";
 import {
@@ -27,27 +29,50 @@ import {
   vehicleTypeOptions,
 } from "~/lib/constants";
 import Link from "next/link";
+import { api } from "~/trpc/react";
+import { toast } from "sonner";
 
-const formSchema = z.object({
-  lastName: z.string().nonempty(""),
-  firstName: z.string().nonempty(""),
-  role: z.string().nonempty(""),
-  idNumber: z.string().nonempty(""),
-  college: z.string().nonempty(""),
-  plateNumber: z.string().nonempty(""),
-  vehicleType: z.string().nonempty(""),
-  email: z
-    .string()
-    .email("Invalid email address")
-    .regex(
-      /^[\w.-]+@(isatu\.edu\.ph|students\.isatu\.edu\.ph)$/,
-      "Email must end with @isatu.edu.ph or @students.isatu.edu.ph",
-    ),
-  password: z.string().nonempty(""),
-  confirmPassword: z.string().nonempty(""),
-});
+const formSchema = z
+  .object({
+    lastName: z.string().min(1, "Last name is required"),
+    firstName: z.string().min(1, "First name is required"),
+    role: z.string().min(1, "Role is required"),
+    idNumber: z.string().min(1, "ID number is required"),
+    college: z.string().min(1, "College is required"),
+    plateNumber: z.string().min(1, "Plate number is required"),
+    vehicleType: z.string().min(1, "Vehicle type is required"),
+    email: z
+      .string()
+      .email("Invalid email address")
+      .regex(
+        /^[\w.-]+@(isatu\.edu\.ph|students\.isatu\.edu\.ph)$/,
+        "Email must end with @isatu.edu.ph or @students.isatu.edu.ph",
+      ),
+    password: z.string().min(6, "Password must be at least 6 characters"),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
 export function RegisterForm() {
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // tRPC mutation
+  const registerMutation = api.auth.register.useMutation({
+    onSuccess: () => {
+      toast.success("Success!");
+      setIsSubmitting(false);
+      router.push("/login"); // Redirect to login page
+    },
+    onError: () => {
+      toast.error("Something went wrong!");
+      setIsSubmitting(false);
+    },
+  });
+
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -66,10 +91,14 @@ export function RegisterForm() {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
+    try {
+      await registerMutation.mutateAsync(values);
+    } catch (error) {
+      // Error is handled in the onError callback
+      console.error("Registration error:", error);
+    }
   }
 
   return (
@@ -90,7 +119,7 @@ export function RegisterForm() {
               <FormItem>
                 <FormLabel>Last Name</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input {...field} disabled={isSubmitting} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -103,7 +132,7 @@ export function RegisterForm() {
               <FormItem>
                 <FormLabel>First Name</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input {...field} disabled={isSubmitting} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -118,7 +147,7 @@ export function RegisterForm() {
               <FormItem>
                 <FormLabel>ID Number</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input {...field} disabled={isSubmitting} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -134,6 +163,7 @@ export function RegisterForm() {
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+                    disabled={isSubmitting}
                   >
                     <FormControl>
                       <SelectTrigger className="w-full">
@@ -163,6 +193,7 @@ export function RegisterForm() {
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+                    disabled={isSubmitting}
                   >
                     <FormControl>
                       <SelectTrigger className="w-full">
@@ -191,7 +222,7 @@ export function RegisterForm() {
               <FormItem>
                 <FormLabel>Plate Number</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input {...field} disabled={isSubmitting} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -207,6 +238,7 @@ export function RegisterForm() {
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+                    disabled={isSubmitting}
                   >
                     <FormControl>
                       <SelectTrigger className="w-full">
@@ -238,7 +270,7 @@ export function RegisterForm() {
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input {...field} disabled={isSubmitting} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -253,7 +285,7 @@ export function RegisterForm() {
               <FormItem>
                 <FormLabel>Password</FormLabel>
                 <FormControl>
-                  <Input {...field} type="password" />
+                  <Input {...field} type="password" disabled={isSubmitting} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -266,7 +298,7 @@ export function RegisterForm() {
               <FormItem>
                 <FormLabel>Confirm Password</FormLabel>
                 <FormControl>
-                  <Input {...field} type="password" />
+                  <Input {...field} type="password" disabled={isSubmitting} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -274,7 +306,9 @@ export function RegisterForm() {
           />
         </div>
         <div className="grid grid-cols-1 gap-2 pt-2">
-          <Button type="submit">Register</Button>
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Creating account..." : "Register"}
+          </Button>
           <div className="text-center text-sm">
             Already have an account?{" "}
             <Link href="/login" className="underline underline-offset-4">
