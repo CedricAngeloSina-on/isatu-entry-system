@@ -35,7 +35,7 @@ export function LoginForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Get the callback URL from search params or default to home
-  const callbackUrl = "/dashboard";
+  const callbackUrl = "/profile";
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({

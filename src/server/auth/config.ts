@@ -39,12 +39,11 @@ declare module "next-auth" {
 export const authConfig = {
   providers: [
     CredentialsProvider({
-      name: "credentials",
+      name: "Credentials",
       credentials: {
         email: {
           label: "Email",
           type: "email",
-          placeholder: "email@example.com",
         },
         password: {
           label: "Password",
@@ -52,31 +51,20 @@ export const authConfig = {
         },
       },
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          return null;
-        }
+        const username = credentials.email as string;
+        const password = credentials.password as string;
 
         // Find user by email in your database
         const user = await db.query.users.findFirst({
-          where: (users, { eq }) =>
-            eq(users.email, credentials.email as string),
+          where: (users, { eq, and }) =>
+            and(eq(users.email, username), eq(users.password, password)),
         });
 
         if (!user) {
           return null;
         }
 
-        // Simple password check (no encryption for basic example)
-        if (credentials.password !== user.password) {
-          return null;
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          image: user.image,
-        };
+        return user;
       },
     }),
     /**
@@ -96,14 +84,15 @@ export const authConfig = {
     verificationTokensTable: verificationTokens,
   }),
   callbacks: {
-    session: ({ session, user }) => ({
+    // Fixed: Use token parameter instead of user for JWT strategy
+    session: ({ session, token }) => ({
       ...session,
       user: {
         ...session.user,
-        id: user.id,
+        id: token.id as string,
       },
     }),
-    // Add JWT callback for credentials provider
+    // JWT callback to store user ID in token
     jwt: ({ token, user }) => {
       if (user) {
         token.id = user.id;
@@ -111,11 +100,11 @@ export const authConfig = {
       return token;
     },
   },
-  // Important: Configure session strategy for credentials
+  // Required for credentials provider
   session: {
-    strategy: "jwt", // Required when using credentials provider
+    strategy: "jwt",
   },
   pages: {
-    signIn: "/auth/signin", // Optional: custom sign-in page
+    signIn: "/auth/signin",
   },
 } satisfies NextAuthConfig;
