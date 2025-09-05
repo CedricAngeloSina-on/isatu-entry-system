@@ -1,8 +1,15 @@
 import Image from "next/image";
+import { auth } from "~/server/auth";
+import { redirect } from "next/navigation";
 
 import { RegisterForm } from "~/components/register-form";
 
-export default function RegisterPage() {
+export default async function RegisterPage() {
+  const session = await auth();
+  if (session?.user) {
+    redirect("/profile");
+  }
+
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
       <div className="relative hidden lg:block">

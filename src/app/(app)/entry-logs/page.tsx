@@ -1,5 +1,6 @@
 import { auth } from "~/server/auth";
 import { redirect } from "next/navigation";
+import { ContentSection } from "~/components/content-section";
 
 export default async function EntryLogsPage() {
   const session = await auth();
@@ -8,14 +9,13 @@ export default async function EntryLogsPage() {
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4">
-      <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-        <div className="bg-muted/50 aspect-video rounded-xl" />
-        <div className="bg-muted/50 aspect-video rounded-xl" />
-        <div className="bg-muted/50 aspect-video rounded-xl" />
+    <ContentSection
+      title="Entry Logs"
+      desc="Here are the recent vehicle entry logs."
+    >
+      <div className="flex-1 overflow-auto py-1 lg:flex-row lg:space-y-0 lg:space-x-12">
+        {/* <UsersTable data={users} search={search} navigate={navigate} /> */}
       </div>
-      ENTRY LOGS
-      <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min" />
-    </div>
+    </ContentSection>
   );
 }

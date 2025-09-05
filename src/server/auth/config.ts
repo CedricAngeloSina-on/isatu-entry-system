@@ -1,14 +1,7 @@
-import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import { type DefaultSession, type NextAuthConfig } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 import { db } from "~/server/db";
-import {
-  accounts,
-  sessions,
-  users,
-  verificationTokens,
-} from "~/server/db/schema";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -21,14 +14,22 @@ declare module "next-auth" {
     user: {
       id: string;
       // ...other properties
-      // role: UserRole;
+      idNumber: string | null;
+      college: string | null;
+      plateNumber: string | null;
+      vehicleType: string | null;
+      role: string | null;
     } & DefaultSession["user"];
   }
 
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
+  interface User {
+    // ...other properties
+    idNumber: string | null;
+    college: string | null;
+    plateNumber: string | null;
+    vehicleType: string | null;
+    role: string | null;
+  }
 }
 
 /**
@@ -77,12 +78,6 @@ export const authConfig = {
      * @see https://next-auth.js.org/providers/github
      */
   ],
-  adapter: DrizzleAdapter(db, {
-    usersTable: users,
-    accountsTable: accounts,
-    sessionsTable: sessions,
-    verificationTokensTable: verificationTokens,
-  }),
   callbacks: {
     // Fixed: Use token parameter instead of user for JWT strategy
     session: ({ session, token }) => ({
@@ -90,12 +85,22 @@ export const authConfig = {
       user: {
         ...session.user,
         id: token.id as string,
+        idNumber: token.idNumber as string | null,
+        college: token.college as string | null,
+        plateNumber: token.plateNumber as string | null,
+        vehicleType: token.vehicleType as string | null,
+        role: token.role as string | null,
       },
     }),
     // JWT callback to store user ID in token
     jwt: ({ token, user }) => {
       if (user) {
         token.id = user.id;
+        token.idNumber = user.idNumber;
+        token.college = user.college;
+        token.plateNumber = user.plateNumber;
+        token.vehicleType = user.vehicleType;
+        token.role = user.role;
       }
       return token;
     },

@@ -1,5 +1,6 @@
 import { auth } from "~/server/auth";
 import { redirect } from "next/navigation";
+import { QRScanner } from "~/components/qr-scanner";
 
 export default async function QRScannerPage() {
   const session = await auth();
@@ -13,9 +14,8 @@ export default async function QRScannerPage() {
         <div className="bg-muted/50 aspect-video rounded-xl" />
         <div className="bg-muted/50 aspect-video rounded-xl" />
         <div className="bg-muted/50 aspect-video rounded-xl" />
+        <QRScanner />
       </div>
-      QR SCANNER
-      <div className="bg-muted/50 min-h-[100vh] flex-1 rounded-xl md:min-h-min" />
     </div>
   );
 }
