@@ -8,7 +8,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   Form,
@@ -31,11 +30,7 @@ const formSchema = z.object({
 });
 
 export function LoginForm() {
-  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Get the callback URL from search params or default to home
-  const callbackUrl = "/profile";
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
@@ -51,21 +46,12 @@ export function LoginForm() {
     setIsSubmitting(true);
 
     try {
-      const result = await signIn("credentials", {
+      await signIn("credentials", {
         email: values.email,
         password: values.password,
-        redirect: false, // Don't redirect automatically, we'll handle it
+        callbackUrl: "/profile",
+        redirect: true,
       });
-
-      if (result?.error) {
-        toast.error("Incorrect password!");
-      } else if (result?.ok) {
-        toast.success("Welcome back!");
-
-        // Redirect to the callback URL or dashboard
-        router.push(callbackUrl);
-        router.refresh(); // Refresh to update session state
-      }
     } catch (error) {
       toast.error("Something went wrong!");
       console.error("Login error:", error);
