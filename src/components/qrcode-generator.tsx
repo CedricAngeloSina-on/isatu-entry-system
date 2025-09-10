@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import QRCode from "qrcode";
+import Image from "next/image";
 
 interface QRCodeGeneratorProps {
   uuid?: string;
@@ -40,11 +41,13 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
   return (
     <div className="flex flex-col items-center space-y-4">
       {qrCodeUrl ? (
-        <div className="border-4">
-          <img
+        <div className="size-48 border-4">
+          <Image
             src={qrCodeUrl}
             alt={`QR Code for UUID: ${uuid}`}
-            className="block"
+            className="block w-full"
+            width="192"
+            height={192}
           />
         </div>
       ) : (
