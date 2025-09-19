@@ -1,6 +1,64 @@
 "use client";
 import { Scanner } from "@yudiel/react-qr-scanner";
+import { api } from "~/trpc/react";
+
+type QRResult = {
+  rawValue: string;
+  [key: string]: unknown; // allow other properties without strict typing
+};
 
 export function QRScanner() {
-  return <Scanner onScan={(result) => console.log(result)} />;
+  const createEntry = api.entryLog.create.useMutation({
+    onSuccess: () => {
+      console.log("Entry logged successfully");
+      // You can add success toast/notification here
+    },
+    onError: (error) => {
+      console.error("Failed to log entry:", error.message);
+      // You can add error toast/notification here
+    },
+  });
+
+  const handleScan = async (result: unknown) => {
+    try {
+      console.log("QR Code scanned:", result);
+
+      // Narrow type: make sure result is an array and has objects with rawValue
+      if (Array.isArray(result) && result.length > 0) {
+        const qrResult = result[0] as QRResult;
+        const qrData = qrResult.rawValue;
+
+        createEntry.mutate({
+          user_id: qrData,
+        });
+      } else {
+        console.warn("No QR code data found");
+      }
+    } catch (error) {
+      console.error("Error processing QR code:", error);
+    }
+  };
+
+  return (
+    <div className="mx-auto w-full max-w-md">
+      <Scanner
+        onScan={handleScan}
+        onError={(error) => console.error("Scanner error:", error)}
+      />
+
+      {/* Optional: Show loading state */}
+      {createEntry.isPending && (
+        <div className="mt-4 text-center text-sm text-gray-600">
+          Logging entry...
+        </div>
+      )}
+
+      {/* Optional: Show error state */}
+      {createEntry.error && (
+        <div className="mt-4 text-center text-sm text-red-600">
+          Error: {createEntry.error.message}
+        </div>
+      )}
+    </div>
+  );
 }

@@ -71,7 +71,7 @@ export default async function ProfilePage() {
 
               {/* QR Code */}
               <div className="h-48 w-full">
-                <QRCodeGenerator />
+                <QRCodeGenerator uuid={session.user.id} />
               </div>
             </div>
           </div>

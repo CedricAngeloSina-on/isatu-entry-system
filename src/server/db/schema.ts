@@ -7,6 +7,7 @@ import {
   text,
   varchar,
   timestamp,
+  serial,
 } from "drizzle-orm/pg-core";
 import { type AdapterAccount } from "next-auth/adapters";
 
@@ -83,6 +84,14 @@ export const verificationTokens = pgTable(
     compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
   }),
 );
+
+export const entry_logs = pgTable("entry_logs", {
+  id: serial("id").primaryKey(),
+  user_id: varchar("user_id", { length: 255 }).notNull(),
+  idNumber: varchar("idNumber", { length: 255 }).notNull(),
+  plateNumber: varchar("plateNumber", { length: 255 }).notNull(),
+  timestamp: timestamp("timestamp", { mode: "date" }).notNull().defaultNow(),
+});
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
   user: one(users, { fields: [accounts.userId], references: [users.id] }),

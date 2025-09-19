@@ -1,0 +1,1 @@
+ALTER TABLE "entry_logs" RENAME COLUMN "student_id" TO "idNumber";

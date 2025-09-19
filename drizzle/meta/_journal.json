@@ -8,6 +8,34 @@
       "when": 1756951774734,
       "tag": "0000_funny_wolf_cub",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1757549650151,
+      "tag": "0001_pale_flatman",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1757551919755,
+      "tag": "0002_cold_synch",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1758251716572,
+      "tag": "0003_blushing_celestials",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1758252266301,
+      "tag": "0004_majestic_mojo",
+      "breakpoints": true
     }
   ]
 }
