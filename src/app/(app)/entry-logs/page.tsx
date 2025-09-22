@@ -5,7 +5,7 @@ import { ContentSection } from "~/components/content-section";
 export default async function EntryLogsPage() {
   const session = await auth();
   if (!session?.user) {
-    redirect("/login");
+    redirect("/");
   }
 
   return (

@@ -5,7 +5,7 @@ import { QRScanner } from "~/components/qr-scanner";
 export default async function QRScannerPage() {
   const session = await auth();
   if (!session?.user) {
-    redirect("/login");
+    redirect("/");
   }
 
   return (

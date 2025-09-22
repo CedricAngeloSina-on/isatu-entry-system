@@ -1,18 +1,33 @@
-import Link from "next/link";
+import Image from "next/image";
+import { auth } from "~/server/auth";
+import { redirect } from "next/navigation";
 
-export default async function Home() {
+import { LoginForm } from "~/components/login-form";
+
+export default async function LoginPage() {
+  const session = await auth();
+  if (session?.user) {
+    redirect("/profile");
+  }
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c] text-white">
-      <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
-        <div className="flex flex-col items-center gap-2">
-          <div className="flex flex-col items-center justify-center gap-4">
-            <Link href={"/login "}>Login Page</Link>
-          </div>
-          <div className="flex flex-col items-center justify-center gap-4">
-            <Link href={"/register "}>Register Page</Link>
+    <div className="grid min-h-svh lg:grid-cols-2">
+      <div className="relative hidden lg:block">
+        <Image
+          src="/isatu-bg.jpg"
+          width={1000}
+          height={1000}
+          alt="Image"
+          className="absolute inset-0 h-full w-full object-right dark:brightness-[0.2] dark:grayscale"
+        />
+      </div>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-1 items-center justify-center">
+          <div className="w-full max-w-xs">
+            <LoginForm />
           </div>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

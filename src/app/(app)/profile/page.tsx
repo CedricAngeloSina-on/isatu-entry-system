@@ -8,7 +8,7 @@ import { ContentSection } from "~/components/content-section";
 export default async function ProfilePage() {
   const session = await auth();
   if (!session?.user) {
-    redirect("/login");
+    redirect("/");
   }
 
   return (

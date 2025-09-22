@@ -65,7 +65,7 @@ export function RegisterForm() {
     onSuccess: () => {
       toast.success("Success!");
       setIsSubmitting(false);
-      router.push("/login"); // Redirect to login page
+      router.push("/"); // Redirect to login page
     },
     onError: () => {
       toast.error("Something went wrong!");
@@ -311,7 +311,7 @@ export function RegisterForm() {
           </Button>
           <div className="text-center text-sm">
             Already have an account?{" "}
-            <Link href="/login" className="underline underline-offset-4">
+            <Link href="/" className="underline underline-offset-4">
               Login
             </Link>
           </div>

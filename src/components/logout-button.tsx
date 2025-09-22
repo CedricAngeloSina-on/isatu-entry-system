@@ -13,7 +13,7 @@ export function LogoutButton() {
 
     try {
       await signOut({
-        callbackUrl: "/login",
+        callbackUrl: "/",
         redirect: true,
       });
     } catch (error) {
