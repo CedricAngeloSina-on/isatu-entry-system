@@ -7,7 +7,7 @@ import { api } from "~/trpc/server";
 
 export default async function EntryLogsPage() {
   const session = await auth();
-  if (!session?.user) {
+  if (!session?.user && session?.user.role != "admin") {
     redirect("/");
   }
 
