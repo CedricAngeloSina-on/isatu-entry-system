@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { entry_logs, users } from "~/server/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, desc, sql } from "drizzle-orm";
 
 export const entryLogRouter = createTRPCRouter({
   create: publicProcedure
@@ -28,30 +28,43 @@ export const entryLogRouter = createTRPCRouter({
           plateNumber: String(student[0]?.plateNumber),
         });
 
-        return {
-          success: true,
-          message: "Entry logged successfully",
-        };
+        return result;
       } catch (error) {
         console.error("Error logging entry:", error);
         throw new Error("Failed to log entry");
       }
     }),
 
-  // Optional: Add a query to get recent entries
-  getRecent: publicProcedure
-    .input(
-      z.object({
-        limit: z.number().min(1).max(100).default(10),
-      }),
-    )
-    .query(async ({ ctx, input }) => {
-      const entries = await ctx.db
-        .select()
-        .from(entry_logs)
-        .limit(input.limit)
-        .orderBy(/* add your timestamp column here, e.g., desc(entry_logs.created_at) */);
+  getAllEntries: publicProcedure.query(async ({ ctx }) => {
+    const entries = await ctx.db
+      .select({
+        id: entry_logs.id,
+        idNumber: sql<string>`COALESCE(${users.idNumber}, '')`,
+        plateNumber: sql<string>`COALESCE(${users.plateNumber}, '')`,
+        vehicleType: sql<string>`COALESCE(UPPER(${users.vehicleType}), '')`,
+        timestamp: entry_logs.timestamp,
+      })
+      .from(entry_logs)
+      .innerJoin(users, eq(entry_logs.user_id, users.id))
+      .orderBy(desc(entry_logs.timestamp));
 
-      return entries;
-    }),
+    return entries;
+  }),
+
+  getMyEntries: publicProcedure.query(async ({ ctx }) => {
+    const entries = await ctx.db
+      .select({
+        id: entry_logs.id,
+        idNumber: sql<string>`COALESCE(${users.idNumber}, '')`,
+        plateNumber: sql<string>`COALESCE(${users.plateNumber}, '')`,
+        vehicleType: sql<string>`COALESCE(UPPER(${users.vehicleType}), '')`,
+        timestamp: entry_logs.timestamp,
+      })
+      .from(entry_logs)
+      .innerJoin(users, eq(entry_logs.user_id, users.id))
+      .where(eq(entry_logs.user_id, String(ctx.session?.user.id)))
+      .orderBy(desc(entry_logs.timestamp));
+
+    return entries;
+  }),
 });

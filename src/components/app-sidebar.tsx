@@ -22,8 +22,13 @@ const mainNavItems = [
     icon: User,
   },
   {
-    title: "Entry Logs",
+    title: "All Entry Logs",
     url: "/entry-logs",
+    icon: List,
+  },
+  {
+    title: "My Entry Logs",
+    url: "/my-entry-logs",
     icon: List,
   },
   {

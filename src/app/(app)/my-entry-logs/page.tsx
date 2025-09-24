@@ -5,14 +5,14 @@ import { DataTable } from "~/components/entry-logs/data-table/data-table";
 import { columns } from "~/components/entry-logs/data-table/columns";
 import { api } from "~/trpc/server";
 
-export default async function EntryLogsPage() {
+export default async function MyEntryLogsPage() {
   const session = await auth();
   if (!session?.user) {
     redirect("/");
   }
 
-  // Fetch entry logs using the tRPC getAllEntries route
-  const entryLogs = await api.entryLog.getAllEntries();
+  // Fetch entry logs using the tRPC getMyEntries route
+  const entryLogs = await api.entryLog.getMyEntries();
 
   // Calculate pagination values based on your needs
   const totalEntries = entryLogs.length;
@@ -21,8 +21,8 @@ export default async function EntryLogsPage() {
 
   return (
     <ContentSection
-      title="Entry Logs"
-      desc="Here are the recent vehicle entry logs."
+      title="My Entry Logs"
+      desc="Here are your recent vehicle entry logs."
     >
       <div className="flex-1 overflow-auto py-1 lg:flex-row lg:space-y-0 lg:space-x-12">
         <DataTable
