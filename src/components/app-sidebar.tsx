@@ -15,30 +15,38 @@ import {
 } from "~/components/ui/sidebar";
 import { LogoutButton } from "~/components/logout-button";
 
-const mainNavItems = [
-  {
-    title: "Profile",
-    url: "/profile",
-    icon: User,
-  },
-  {
-    title: "All Entry Logs",
-    url: "/entry-logs",
-    icon: List,
-  },
-  {
-    title: "My Entry Logs",
-    url: "/my-entry-logs",
-    icon: List,
-  },
-  {
-    title: "QR Scanner",
-    url: "/qr-scanner",
-    icon: Scan,
-  },
-];
+type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
+  isAdmin: string;
+};
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ isAdmin, ...props }: AppSidebarProps) {
+  const mainNavItems = [
+    {
+      title: "Profile",
+      url: "/profile",
+      icon: User,
+    },
+    ...(isAdmin == "admin"
+      ? [
+          {
+            title: "All Entry Logs",
+            url: "/entry-logs",
+            icon: List,
+          },
+        ]
+      : []),
+    {
+      title: "My Entry Logs",
+      url: "/my-entry-logs",
+      icon: List,
+    },
+    {
+      title: "QR Scanner",
+      url: "/qr-scanner",
+      icon: Scan,
+    },
+  ];
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>

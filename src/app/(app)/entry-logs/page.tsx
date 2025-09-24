@@ -7,8 +7,12 @@ import { api } from "~/trpc/server";
 
 export default async function EntryLogsPage() {
   const session = await auth();
-  if (!session?.user && session?.user.role != "admin") {
+  if (!session?.user) {
     redirect("/");
+  }
+
+  if (session?.user.role != "admin") {
+    redirect("/profile");
   }
 
   // Fetch entry logs using the tRPC getAllEntries route

@@ -1,3 +1,4 @@
+import { auth } from "~/server/auth";
 import { AppSidebar } from "~/components/app-sidebar";
 import { Separator } from "~/components/ui/separator";
 import {
@@ -6,12 +7,16 @@ import {
   SidebarTrigger,
 } from "~/components/ui/sidebar";
 
-export default function AppLayout({
+export default async function AppLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const session = await auth();
+
+  const role = session?.user.role;
+
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar isAdmin={String(role)} />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 border-b">
           <div className="flex items-center gap-2 px-3">
