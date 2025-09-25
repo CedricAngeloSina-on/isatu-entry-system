@@ -55,16 +55,22 @@ export const authConfig = {
         const username = credentials.email as string;
         const password = credentials.password as string;
 
-        // Find user by email in your database
+        // First, find user by email
         const user = await db.query.users.findFirst({
-          where: (users, { eq, and }) =>
-            and(eq(users.email, username), eq(users.password, password)),
+          where: (users, { eq }) => eq(users.email, username),
         });
 
+        // If user doesn't exist
         if (!user) {
-          return null;
+          throw new Error("User not found");
         }
 
+        // If user exists but password is incorrect
+        if (user.password !== password) {
+          throw new Error("Incorrect password");
+        }
+
+        // If everything is correct, return the user
         return user;
       },
     }),
@@ -111,5 +117,6 @@ export const authConfig = {
   },
   pages: {
     signIn: "/auth/signin",
+    error: "/auth/error", // Optional: custom error page
   },
 } satisfies NextAuthConfig;

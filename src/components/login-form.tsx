@@ -9,6 +9,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { toast } from "sonner";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 import {
   Form,
   FormControl,
@@ -31,6 +33,33 @@ const formSchema = z.object({
 
 export function LoginForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Handle NextAuth error messages from URL params
+  useEffect(() => {
+    const error = searchParams.get("error");
+    if (error) {
+      switch (error) {
+        case "CredentialsSignin":
+          const message = searchParams.get("message");
+          if (message === "User not found") {
+            toast.error("No account found with this email address");
+          } else if (message === "Incorrect password") {
+            toast.error("Incorrect password. Please try again");
+          } else {
+            toast.error(
+              "Invalid credentials. Please check your email and password",
+            );
+          }
+          break;
+        default:
+          toast.error("An error occurred during login");
+      }
+      // Clean up the URL by removing error params
+      router.replace("/auth/signin", { scroll: false });
+    }
+  }, [searchParams, router]);
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
@@ -46,12 +75,28 @@ export function LoginForm() {
     setIsSubmitting(true);
 
     try {
-      await signIn("credentials", {
+      const result = await signIn("credentials", {
         email: values.email,
         password: values.password,
-        callbackUrl: "/profile",
-        redirect: true,
+        redirect: false, // Don't redirect automatically
       });
+
+      if (result?.error) {
+        // Handle specific error messages
+        if (result.error === "User not found") {
+          toast.error("No account found with this email address");
+        } else if (result.error === "Incorrect password") {
+          toast.error("Incorrect password. Please try again");
+        } else {
+          toast.error(
+            "Invalid credentials. Please check your email and password",
+          );
+        }
+      } else if (result?.ok) {
+        toast.success("Login successful!");
+        // Redirect to profile or dashboard
+        router.push("/profile");
+      }
     } catch (error) {
       toast.error("Something went wrong!");
       console.error("Login error:", error);
