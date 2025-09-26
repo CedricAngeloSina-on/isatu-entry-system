@@ -23,6 +23,7 @@ const registerSchema = z
       ),
     password: z.string().min(1, "Password is required"),
     confirmPassword: z.string().min(1, "Confirm password is required"),
+    image: z.string().url("Invalid image URL").optional().nullable(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -33,6 +34,7 @@ export const authRouter = createTRPCRouter({
   register: publicProcedure
     .input(registerSchema)
     .mutation(async ({ ctx, input }) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { confirmPassword, ...userData } = input;
 
       try {
@@ -60,13 +62,25 @@ export const authRouter = createTRPCRouter({
           });
         }
 
+        // Check if plate number already exists (assuming plate numbers should be unique)
+        const existingPlate = await ctx.db.query.users.findFirst({
+          where: (users, { eq }) => eq(users.plateNumber, input.plateNumber),
+        });
+
+        if (existingPlate) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "User with this plate number already exists",
+          });
+        }
+
         // Create the user
         const [newUser] = await ctx.db
           .insert(users)
           .values({
             id: crypto.randomUUID(), // Required since your schema doesn't auto-generate
             email: userData.email,
-            password: userData.password,
+            password: userData.password, // Note: You should hash this password before storing
             name: `${userData.firstName} ${userData.lastName}`,
             firstName: userData.firstName,
             lastName: userData.lastName,
@@ -75,10 +89,12 @@ export const authRouter = createTRPCRouter({
             college: userData.college,
             plateNumber: userData.plateNumber,
             vehicleType: userData.vehicleType,
+            image: userData.image, // Add the image URL to the database
           })
           .returning();
 
         // Don't return the password in the response
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { password, ...userWithoutPassword } = newUser!;
 
         return {
@@ -90,6 +106,9 @@ export const authRouter = createTRPCRouter({
         if (error instanceof TRPCError) {
           throw error;
         }
+
+        // Log the actual error for debugging
+        console.error("Registration error:", error);
 
         throw new TRPCError({
           code: "INTERNAL_SERVER_ERROR",

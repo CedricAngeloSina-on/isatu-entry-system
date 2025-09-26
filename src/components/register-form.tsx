@@ -5,6 +5,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Upload, X } from "lucide-react";
+import * as React from "react";
+import { toast } from "sonner";
+import { UploadThingError } from "uploadthing/server";
 
 import { Button } from "~/components/ui/button";
 import {
@@ -30,7 +34,16 @@ import {
 } from "~/lib/constants";
 import Link from "next/link";
 import { api } from "~/trpc/react";
-import { toast } from "sonner";
+import { uploadFiles } from "~/utils/uploadthing";
+import {
+  FileUpload,
+  FileUploadDropzone,
+  FileUploadItem,
+  FileUploadItemMetadata,
+  FileUploadItemPreview,
+  FileUploadList,
+  FileUploadTrigger,
+} from "~/components/ui/file-upload";
 
 const formSchema = z
   .object({
@@ -50,6 +63,7 @@ const formSchema = z
       ),
     password: z.string().min(6, "Password must be at least 6 characters"),
     confirmPassword: z.string().min(1, "Please confirm your password"),
+    image: z.instanceof(File).optional().or(z.string().optional()),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -59,21 +73,25 @@ const formSchema = z
 export function RegisterForm() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [files, setFiles] = useState<File[]>([]);
+  const [uploadProgress, setUploadProgress] = useState<Record<string, number>>(
+    {},
+  );
 
   // tRPC mutation
   const registerMutation = api.auth.register.useMutation({
     onSuccess: () => {
-      toast.success("Success!");
+      toast.success("Account created successfully!");
       setIsSubmitting(false);
       router.push("/"); // Redirect to login page
     },
-    onError: () => {
-      toast.error("Something went wrong!");
+    onError: (error) => {
+      toast.error(error.message || "Something went wrong!");
       setIsSubmitting(false);
     },
   });
 
-  // 1. Define your form.
+  // Define form
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -87,19 +105,86 @@ export function RegisterForm() {
       email: "",
       password: "",
       confirmPassword: "",
+      image: undefined,
     },
   });
 
-  // 2. Define a submit handler.
+  // Handle file upload during form submission
+  const uploadFilesDuringSubmit = async (files: File[]) => {
+    if (files.length === 0) return [];
+
+    try {
+      const res = await uploadFiles("imageUploader", {
+        files,
+        onUploadProgress: ({ file, progress }) => {
+          setUploadProgress((prev) => ({
+            ...prev,
+            [file.name]: progress,
+          }));
+        },
+      });
+
+      return res;
+    } catch (error) {
+      if (error instanceof UploadThingError) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const errorMessage =
+          error.data && "error" in error.data
+            ? // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+              error.data.error
+            : "Upload failed";
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+        throw new Error(errorMessage);
+      }
+      throw error;
+    }
+  };
+
+  // Submit handler
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
+
     try {
-      await registerMutation.mutateAsync(values);
+      let uploadedFiles: Awaited<ReturnType<typeof uploadFiles>> = [];
+
+      // Upload files if any are selected
+      if (files.length > 0) {
+        toast.info("Uploading image...");
+        uploadedFiles = await uploadFilesDuringSubmit(files);
+        toast.success("Image uploaded successfully!");
+      }
+
+      // Prepare form data with uploaded file URLs
+      const formData = {
+        ...values,
+        image: uploadedFiles.length > 0 ? uploadedFiles[0]?.url : undefined,
+      };
+
+      // Submit registration
+      await registerMutation.mutateAsync(formData);
     } catch (error) {
-      // Error is handled in the onError callback
       console.error("Registration error:", error);
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("An unknown error occurred");
+      }
+      setIsSubmitting(false);
     }
   }
+
+  // Handle file rejection
+  const onFileReject = React.useCallback((file: File, message: string) => {
+    toast.error(message, {
+      description: `"${file.name.length > 20 ? `${file.name.slice(0, 20)}...` : file.name}" has been rejected`,
+    });
+  }, []);
+
+  // Handle file removal
+  const removeFile = (index: number) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+    form.setValue("image", undefined);
+  };
 
   return (
     <Form {...form}>
@@ -111,6 +196,7 @@ export function RegisterForm() {
             account.
           </p>
         </div>
+
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -139,6 +225,7 @@ export function RegisterForm() {
             )}
           />
         </div>
+
         <div className="grid grid-cols-3 gap-4">
           <FormField
             control={form.control}
@@ -214,6 +301,7 @@ export function RegisterForm() {
             )}
           />
         </div>
+
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -262,6 +350,7 @@ export function RegisterForm() {
             )}
           />
         </div>
+
         <div className="grid grid-cols-1">
           <FormField
             control={form.control}
@@ -277,6 +366,7 @@ export function RegisterForm() {
             )}
           />
         </div>
+
         <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -305,6 +395,87 @@ export function RegisterForm() {
             )}
           />
         </div>
+
+        {/* Integrated File Upload Component */}
+        <FormField
+          control={form.control}
+          name="image"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Profile Image (Optional)</FormLabel>
+              <FormControl>
+                <FileUpload
+                  accept="image/*"
+                  maxFiles={1}
+                  maxSize={8 * 1024 * 1024}
+                  className="w-full max-w-md"
+                  onAccept={(acceptedFiles) => {
+                    setFiles(acceptedFiles);
+                    field.onChange(acceptedFiles[0]);
+                  }}
+                  onFileReject={onFileReject}
+                  multiple={false}
+                  disabled={isSubmitting}
+                >
+                  <FileUploadDropzone>
+                    <div className="flex flex-col items-center gap-1 text-center">
+                      <Upload className="text-muted-foreground h-8 w-8" />
+                      <p className="text-sm font-medium">
+                        Drag & drop image here
+                      </p>
+                      <p className="text-muted-foreground text-xs">
+                        Or click to browse (max 1 file, up to 8MB)
+                      </p>
+                    </div>
+                    <FileUploadTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="mt-2 w-fit"
+                        type="button"
+                      >
+                        Browse files
+                      </Button>
+                    </FileUploadTrigger>
+                  </FileUploadDropzone>
+                  <FileUploadList>
+                    {files.map((file, index) => (
+                      <FileUploadItem key={index} value={file}>
+                        <div className="flex w-full items-center gap-2">
+                          <FileUploadItemPreview />
+                          <FileUploadItemMetadata />
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-7"
+                            onClick={() => removeFile(index)}
+                            type="button"
+                            disabled={isSubmitting}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        {isSubmitting &&
+                          uploadProgress[file.name] !== undefined && (
+                            <div className="h-2 w-full rounded-full bg-gray-200">
+                              <div
+                                className="h-2 rounded-full bg-blue-600 transition-all duration-300"
+                                style={{
+                                  width: `${uploadProgress[file.name]}%`,
+                                }}
+                              />
+                            </div>
+                          )}
+                      </FileUploadItem>
+                    ))}
+                  </FileUploadList>
+                </FileUpload>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         <div className="grid grid-cols-1 gap-2 pt-2">
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Creating account..." : "Register"}

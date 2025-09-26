@@ -1,6 +1,14 @@
 "use client";
 
 import { Button } from "~/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
 import Link from "next/link";
 import z from "zod";
@@ -11,14 +19,6 @@ import { signIn } from "next-auth/react";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "./ui/form";
 
 const formSchema = z.object({
   email: z

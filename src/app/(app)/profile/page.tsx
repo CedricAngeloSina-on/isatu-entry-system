@@ -4,6 +4,7 @@ import QRCodeGenerator from "~/components/qrcode-generator";
 import { Label } from "~/components/ui/label";
 import { Input } from "~/components/ui/input";
 import { ContentSection } from "~/components/content-section";
+import Image from "next/image";
 
 export default async function ProfilePage() {
   const session = await auth();
@@ -63,10 +64,14 @@ export default async function ProfilePage() {
             {/* Right side - Picture and QR */}
             <div className="ml-4 w-48 space-y-4">
               {/* Picture placeholder */}
-              <div className="flex h-48 w-full items-center justify-center rounded-lg border-2 border-black bg-gray-50">
-                {/* <Input className=" text-lg text-gray-600 ">
-                  Picture
-                </Input> */}
+              <div className="relative flex h-48 w-full items-center justify-center rounded-lg border-2 border-black bg-gray-50">
+                <Image
+                  src={session.user.image!}
+                  alt={""}
+                  layout="fill"
+                  objectFit="cover"
+                  className="rounded-lg" // Optional: apply rounded corners to the image itself
+                />
               </div>
 
               {/* QR Code */}
