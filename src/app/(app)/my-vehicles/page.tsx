@@ -12,13 +12,13 @@ export default async function MyVehiclesPage() {
     redirect("/");
   }
 
-  // Fetch entry logs using the tRPC getMyEntries route
-  // const entryLogs = await api.entryLog.getMyEntries();
+  // Fetch entry logs using the tRPC getMyVehicles route
+  const entryLogs = await api.vehicle.getMyVehicles();
 
   // // Calculate pagination values based on your needs
-  // const totalEntries = entryLogs.length;
-  // const perPage = 10; // Adjust as needed
-  // const pageCount = Math.ceil(totalEntries / perPage);
+  const totalEntries = entryLogs.length;
+  const perPage = 10; // Adjust as needed
+  const pageCount = Math.ceil(totalEntries / perPage);
 
   return (
     <ContentSection title="My Vehicles" desc="Here are your list of vehicles.">
@@ -27,7 +27,7 @@ export default async function MyVehiclesPage() {
         <DataTable
           data={[]}
           columns={columns}
-          pageCount={1}
+          pageCount={pageCount}
           currentPage={1}
           perPage={10}
         />

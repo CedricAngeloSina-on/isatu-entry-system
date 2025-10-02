@@ -86,13 +86,17 @@ export const verificationTokens = pgTable(
 
 export const entry_logs = pgTable("entry_logs", {
   id: serial("id").primaryKey(),
-  vehicle_id: varchar("vehicle_id", { length: 255 }).notNull(),
+  vehicle_id: integer("vehicle_id")
+    .notNull()
+    .references(() => vehicles.id),
   timestamp: timestamp("timestamp", { mode: "date" }).notNull().defaultNow(),
 });
 
 export const vehicles = pgTable("vehicles", {
   id: serial("id").primaryKey(),
-  user_id: varchar("user_id", { length: 255 }).notNull(),
+  user_id: varchar("user_id", { length: 255 })
+    .notNull()
+    .references(() => users.id),
   vehicleType: varchar("vehicleType", { length: 255 }).notNull(),
   vehicleColor: varchar("vehicleColor", { length: 255 }).notNull(),
   plateNumber: varchar("plateNumber", { length: 255 }).notNull(),

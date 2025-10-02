@@ -1,1 +1,0 @@
-ALTER TABLE "entry_logs" ADD COLUMN "user_id" varchar(255) NOT NULL;

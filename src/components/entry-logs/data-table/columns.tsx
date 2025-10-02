@@ -5,7 +5,9 @@ import { format } from "date-fns";
 
 export interface EntryLog {
   id: number;
+  name: string;
   idNumber: string;
+  college: string;
   plateNumber: string;
   vehicleType: string;
   timestamp: Date;

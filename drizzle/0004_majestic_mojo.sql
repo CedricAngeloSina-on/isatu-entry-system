@@ -1,1 +1,0 @@
-ALTER TABLE "entry_logs" RENAME COLUMN "plate_number" TO "plateNumber";
