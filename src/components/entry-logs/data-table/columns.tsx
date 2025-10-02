@@ -16,9 +16,21 @@ export const columns: ColumnDef<EntryLog>[] = [
     id: "id",
   },
   {
+    accessorKey: "name",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Name" />
+    ),
+  },
+  {
     accessorKey: "idNumber",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="ID Number" />
+    ),
+  },
+  {
+    accessorKey: "college",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="College" />
     ),
   },
   {
@@ -31,12 +43,6 @@ export const columns: ColumnDef<EntryLog>[] = [
   //     accessorKey: "role",
   //     header: ({ column }) => (
   //       <DataTableColumnHeader column={column} title="Role" />
-  //     ),
-  //   },
-  //   {
-  //     accessorKey: "college",
-  //     header: ({ column }) => (
-  //       <DataTableColumnHeader column={column} title="College" />
   //     ),
   //   },
   {

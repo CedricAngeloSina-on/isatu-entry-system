@@ -39,7 +39,9 @@ export const entryLogRouter = createTRPCRouter({
     const entries = await ctx.db
       .select({
         id: entry_logs.id,
+        name: sql<string>`COALESCE(${users.name}, '')`,
         idNumber: sql<string>`COALESCE(${users.idNumber}, '')`,
+        college: sql<string>`COALESCE(${users.college}, '')`,
         plateNumber: sql<string>`COALESCE(${users.plateNumber}, '')`,
         vehicleType: sql<string>`COALESCE(UPPER(${users.vehicleType}), '')`,
         timestamp: entry_logs.timestamp,
@@ -55,7 +57,9 @@ export const entryLogRouter = createTRPCRouter({
     const entries = await ctx.db
       .select({
         id: entry_logs.id,
+        name: sql<string>`COALESCE(${users.name}, '')`,
         idNumber: sql<string>`COALESCE(${users.idNumber}, '')`,
+        college: sql<string>`COALESCE(${users.college}, '')`,
         plateNumber: sql<string>`COALESCE(${users.plateNumber}, '')`,
         vehicleType: sql<string>`COALESCE(UPPER(${users.vehicleType}), '')`,
         timestamp: entry_logs.timestamp,

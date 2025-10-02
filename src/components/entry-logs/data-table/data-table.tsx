@@ -75,7 +75,7 @@ export function DataTable<TData extends EntryLog, TValue>({
   });
 
   return (
-    <div className="w-full space-y-2 p-4">
+    <div className="w-full space-y-2">
       <div className="rounded-md border">
         <Table>
           <TableHeader>
