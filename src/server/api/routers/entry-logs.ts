@@ -25,7 +25,7 @@ export const entryLogRouter = createTRPCRouter({
         const result = await ctx.db.insert(entry_logs).values({
           user_id: String(student[0]?.id),
           idNumber: String(student[0]?.idNumber),
-          plateNumber: String(student[0]?.plateNumber),
+          plateNumber: String(""),
         });
 
         return result;
@@ -42,8 +42,6 @@ export const entryLogRouter = createTRPCRouter({
         name: sql<string>`COALESCE(${users.name}, '')`,
         idNumber: sql<string>`COALESCE(${users.idNumber}, '')`,
         college: sql<string>`COALESCE(${users.college}, '')`,
-        plateNumber: sql<string>`COALESCE(${users.plateNumber}, '')`,
-        vehicleType: sql<string>`COALESCE(UPPER(${users.vehicleType}), '')`,
         timestamp: entry_logs.timestamp,
       })
       .from(entry_logs)
@@ -60,8 +58,6 @@ export const entryLogRouter = createTRPCRouter({
         name: sql<string>`COALESCE(${users.name}, '')`,
         idNumber: sql<string>`COALESCE(${users.idNumber}, '')`,
         college: sql<string>`COALESCE(${users.college}, '')`,
-        plateNumber: sql<string>`COALESCE(${users.plateNumber}, '')`,
-        vehicleType: sql<string>`COALESCE(UPPER(${users.vehicleType}), '')`,
         timestamp: entry_logs.timestamp,
       })
       .from(entry_logs)

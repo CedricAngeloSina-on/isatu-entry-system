@@ -8,12 +8,11 @@ import { TRPCError } from "@trpc/server";
 const registerSchema = z
   .object({
     lastName: z.string().min(1, "Last name is required"),
+    middleName: z.string(),
     firstName: z.string().min(1, "First name is required"),
     role: z.string().min(1, "Role is required"),
     idNumber: z.string().min(1, "ID number is required"),
     college: z.string().min(1, "College is required"),
-    plateNumber: z.string().min(1, "Plate number is required"),
-    vehicleType: z.string().min(1, "Vehicle type is required"),
     email: z
       .string()
       .email("Invalid email address")
@@ -62,18 +61,6 @@ export const authRouter = createTRPCRouter({
           });
         }
 
-        // Check if plate number already exists (assuming plate numbers should be unique)
-        const existingPlate = await ctx.db.query.users.findFirst({
-          where: (users, { eq }) => eq(users.plateNumber, input.plateNumber),
-        });
-
-        if (existingPlate) {
-          throw new TRPCError({
-            code: "CONFLICT",
-            message: "User with this plate number already exists",
-          });
-        }
-
         // Create the user
         const [newUser] = await ctx.db
           .insert(users)
@@ -83,12 +70,11 @@ export const authRouter = createTRPCRouter({
             password: userData.password, // Note: You should hash this password before storing
             name: `${userData.firstName} ${userData.lastName}`,
             firstName: userData.firstName,
+            middleName: userData.middleName,
             lastName: userData.lastName,
             role: userData.role,
             idNumber: userData.idNumber,
             college: userData.college,
-            plateNumber: userData.plateNumber,
-            vehicleType: userData.vehicleType,
             image: userData.image, // Add the image URL to the database
           })
           .returning();

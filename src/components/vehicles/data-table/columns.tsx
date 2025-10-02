@@ -39,6 +39,12 @@ export const columns: ColumnDef<EntryLog>[] = [
       <DataTableColumnHeader column={column} title="Plate Number" />
     ),
   },
+  //   {
+  //     accessorKey: "role",
+  //     header: ({ column }) => (
+  //       <DataTableColumnHeader column={column} title="Role" />
+  //     ),
+  //   },
   {
     accessorKey: "vehicleType",
     header: ({ column }) => (

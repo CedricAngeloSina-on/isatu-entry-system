@@ -1,6 +1,7 @@
 import { auth } from "~/server/auth";
 import { redirect } from "next/navigation";
 import { QRScanner } from "~/components/qr-scanner";
+import { ContentSection } from "~/components/content-section";
 
 export default async function QRScannerPage() {
   const session = await auth();
@@ -13,10 +14,8 @@ export default async function QRScannerPage() {
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4">
-      <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-        <QRScanner />
-      </div>
-    </div>
+    <ContentSection title="QR Scanner" desc="Scan QR codes of drivers">
+      <QRScanner />
+    </ContentSection>
   );
 }

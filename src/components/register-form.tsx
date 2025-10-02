@@ -27,11 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import {
-  collegeOptions,
-  roleOptions,
-  vehicleTypeOptions,
-} from "~/lib/constants";
+import { collegeOptions, roleOptions } from "~/lib/constants";
 import Link from "next/link";
 import { api } from "~/trpc/react";
 import { uploadFiles } from "~/utils/uploadthing";
@@ -48,12 +44,11 @@ import {
 const formSchema = z
   .object({
     lastName: z.string().min(1, "Last name is required"),
+    middleName: z.string(),
     firstName: z.string().min(1, "First name is required"),
     role: z.string().min(1, "Role is required"),
     idNumber: z.string().min(1, "ID number is required"),
     college: z.string().min(1, "College is required"),
-    plateNumber: z.string().min(1, "Plate number is required"),
-    vehicleType: z.string().min(1, "Vehicle type is required"),
     email: z
       .string()
       .email("Invalid email address")
@@ -96,12 +91,11 @@ export function RegisterForm() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       lastName: "",
+      middleName: "",
       firstName: "",
       role: "",
       idNumber: "",
-      vehicleType: "",
       college: "",
-      plateNumber: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -197,13 +191,26 @@ export function RegisterForm() {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <FormField
             control={form.control}
             name="lastName"
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Last Name</FormLabel>
+                <FormControl>
+                  <Input {...field} disabled={isSubmitting} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="middleName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Middle Name</FormLabel>
                 <FormControl>
                   <Input {...field} disabled={isSubmitting} />
                 </FormControl>
@@ -302,55 +309,6 @@ export function RegisterForm() {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="plateNumber"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Plate Number</FormLabel>
-                <FormControl>
-                  <Input {...field} disabled={isSubmitting} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="vehicleType"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Vehicle Type</FormLabel>
-                <FormControl>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    disabled={isSubmitting}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Select vehicle type" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {vehicleTypeOptions.map((vehicleType) => (
-                        <SelectItem
-                          key={vehicleType.value}
-                          value={vehicleType.value}
-                        >
-                          {vehicleType.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
         <div className="grid grid-cols-1">
           <FormField
             control={form.control}
@@ -402,13 +360,13 @@ export function RegisterForm() {
           name="image"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Profile Image (Optional)</FormLabel>
+              <FormLabel>Profile Image</FormLabel>
               <FormControl>
                 <FileUpload
                   accept="image/*"
                   maxFiles={1}
                   maxSize={8 * 1024 * 1024}
-                  className="w-full max-w-md"
+                  className="w-full max-w-md xl:max-w-xl"
                   onAccept={(acceptedFiles) => {
                     setFiles(acceptedFiles);
                     field.onChange(acceptedFiles[0]);

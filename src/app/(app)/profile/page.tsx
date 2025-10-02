@@ -19,7 +19,7 @@ export default async function ProfilePage() {
           {/* ID Card Container */}
           <div className="flex flex-col lg:flex-row">
             {/* Left side - Form fields */}
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <div className="grid grid-cols-1 gap-4">
               {/* Name */}
               <div className="lg:w-[300px]">
                 <Label className="flex-shrink-0 text-lg">Name:</Label>
@@ -34,28 +34,12 @@ export default async function ProfilePage() {
 
               {/* College */}
               <div className="lg:w-[300px]">
-                {" "}
                 <Label className="flex-shrink-0 text-lg">College:</Label>
                 <Input value={session.user.college!} disabled />
               </div>
 
-              {/* Plate Number */}
-              <div className="lg:w-[300px]">
-                {" "}
-                <Label className="flex-shrink-0 text-lg">Plate Number:</Label>
-                <Input value={session.user.plateNumber!} disabled />
-              </div>
-
-              {/* Vehicle Type */}
-              <div className="lg:w-[300px]">
-                {" "}
-                <Label className="flex-shrink-0 text-lg">Vehicle Type:</Label>
-                <Input value={session.user.vehicleType!} disabled />
-              </div>
-
               {/* Email */}
               <div className="lg:w-[300px]">
-                {" "}
                 <Label className="flex-shrink-0 text-lg">Email:</Label>
                 <Input value={session.user.email!} disabled />
               </div>
@@ -75,73 +59,6 @@ export default async function ProfilePage() {
               </div>
 
               {/* QR Code */}
-              <div className="h-48 w-full">
-                <QRCodeGenerator uuid={session.user.id} />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col lg:flex-row">
-            {/* Left side - Form fields */}
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-              {/* Name */}
-              <div className="lg:w-[300px]">
-                <Label className="flex-shrink-0 text-lg">Name:</Label>
-                <Input value={session.user.name!} disabled />
-              </div>
-
-              {/* ID Number */}
-              <div className="lg:w-[300px]">
-                <Label className="flex-shrink-0 text-lg">ID Number:</Label>
-                <Input value={session.user.idNumber!} disabled />
-              </div>
-
-              {/* College */}
-              <div className="lg:w-[300px]">
-                {" "}
-                <Label className="flex-shrink-0 text-lg">College:</Label>
-                <Input value={session.user.college!} disabled />
-              </div>
-
-              {/* Plate Number */}
-              <div className="lg:w-[300px]">
-                {" "}
-                <Label className="flex-shrink-0 text-lg">Plate Number:</Label>
-                <Input value={session.user.plateNumber!} disabled />
-              </div>
-
-              {/* Vehicle Type */}
-              <div className="lg:w-[300px]">
-                {" "}
-                <Label className="flex-shrink-0 text-lg">Vehicle Type:</Label>
-                <Input value={session.user.vehicleType!} disabled />
-              </div>
-
-              {/* Email */}
-              <div className="lg:w-[300px]">
-                {" "}
-                <Label className="flex-shrink-0 text-lg">Email:</Label>
-                <Input value={session.user.email!} disabled />
-              </div>
-            </div>
-
-            {/* Right side - Picture and QR */}
-            <div className="ml-4 w-48 space-y-4">
-              {/* Picture placeholder */}
-              <div className="relative flex h-48 w-full items-center justify-center rounded-lg border-2 border-black bg-gray-50">
-                <Image
-                  src={session.user.image!}
-                  alt={""}
-                  layout="fill"
-                  objectFit="cover"
-                  className="rounded-lg" // Optional: apply rounded corners to the image itself
-                />
-              </div>
-
-              {/* QR Code */}
-              <div className="h-48 w-full">
-                <QRCodeGenerator uuid={session.user.id} />
-              </div>
               <div className="h-48 w-full">
                 <QRCodeGenerator uuid={session.user.id} />
               </div>

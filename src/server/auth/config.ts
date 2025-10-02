@@ -16,8 +16,6 @@ declare module "next-auth" {
       // ...other properties
       idNumber: string | null;
       college: string | null;
-      plateNumber: string | null;
-      vehicleType: string | null;
       role: string | null;
     } & DefaultSession["user"];
   }
@@ -26,8 +24,6 @@ declare module "next-auth" {
     // ...other properties
     idNumber: string | null;
     college: string | null;
-    plateNumber: string | null;
-    vehicleType: string | null;
     role: string | null;
   }
 }
@@ -93,8 +89,6 @@ export const authConfig = {
         id: token.id as string,
         idNumber: token.idNumber as string | null,
         college: token.college as string | null,
-        plateNumber: token.plateNumber as string | null,
-        vehicleType: token.vehicleType as string | null,
         role: token.role as string | null,
       },
     }),
@@ -104,8 +98,6 @@ export const authConfig = {
         token.id = user.id;
         token.idNumber = user.idNumber;
         token.college = user.college;
-        token.plateNumber = user.plateNumber;
-        token.vehicleType = user.vehicleType;
         token.role = user.role;
       }
       return token;

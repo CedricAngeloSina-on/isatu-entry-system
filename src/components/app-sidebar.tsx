@@ -1,6 +1,6 @@
 import * as React from "react";
 import Link from "next/link";
-import { GalleryVerticalEnd, List, Scan, User } from "lucide-react";
+import { CarFront, GalleryVerticalEnd, List, Scan, User } from "lucide-react";
 
 import {
   Sidebar,
@@ -41,10 +41,19 @@ export function AppSidebar({ isAdmin, ...props }: AppSidebarProps) {
       icon: List,
     },
     {
-      title: "QR Scanner",
-      url: "/qr-scanner",
-      icon: Scan,
+      title: "My Vehicles",
+      url: "/my-vehicles",
+      icon: CarFront,
     },
+    ...(isAdmin == "admin"
+      ? [
+          {
+            title: "QR Scanner",
+            url: "/qr-scanner",
+            icon: Scan,
+          },
+        ]
+      : []),
   ];
 
   return (

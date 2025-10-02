@@ -21,12 +21,11 @@ export const users = pgTable("user", {
 
   // Additional fields from your registration form
   firstName: varchar("firstName", { length: 255 }),
+  middleName: varchar("middleName", { length: 255 }),
   lastName: varchar("lastName", { length: 255 }),
   role: varchar("role", { length: 255 }),
   idNumber: varchar("idNumber", { length: 255 }),
   college: varchar("college", { length: 255 }),
-  plateNumber: varchar("plateNumber", { length: 255 }),
-  vehicleType: varchar("vehicleType", { length: 255 }),
 });
 
 // Rest of your existing schema...
@@ -87,10 +86,16 @@ export const verificationTokens = pgTable(
 
 export const entry_logs = pgTable("entry_logs", {
   id: serial("id").primaryKey(),
-  user_id: varchar("user_id", { length: 255 }).notNull(),
-  idNumber: varchar("idNumber", { length: 255 }).notNull(),
-  plateNumber: varchar("plateNumber", { length: 255 }).notNull(),
+  vehicle_id: varchar("vehicle_id", { length: 255 }).notNull(),
   timestamp: timestamp("timestamp", { mode: "date" }).notNull().defaultNow(),
+});
+
+export const vehicles = pgTable("vehicles", {
+  id: serial("id").primaryKey(),
+  user_id: varchar("user_id", { length: 255 }).notNull(),
+  vehicleType: varchar("vehicleType", { length: 255 }).notNull(),
+  vehicleColor: varchar("vehicleColor", { length: 255 }).notNull(),
+  plateNumber: varchar("plateNumber", { length: 255 }).notNull(),
 });
 
 export const accountsRelations = relations(accounts, ({ one }) => ({
