@@ -1,5 +1,5 @@
 "use client";
-import { type EntryLog } from "~/components/entry-logs/data-table/columns";
+import { type Vehicle } from "~/components/vehicles/data-table/columns";
 import {
   Table,
   TableBody,
@@ -30,7 +30,7 @@ interface DataTableProps<TData, TValue> {
   perPage: number;
 }
 
-export function DataTable<TData extends EntryLog, TValue>({
+export function DataTable<TData extends Vehicle, TValue>({
   columns,
   data,
   pageCount,

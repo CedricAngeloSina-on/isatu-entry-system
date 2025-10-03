@@ -1,10 +1,10 @@
 import { auth } from "~/server/auth";
 import { redirect } from "next/navigation";
 import { ContentSection } from "~/components/content-section";
-import { DataTable } from "~/components/entry-logs/data-table/data-table";
-import { columns } from "~/components/entry-logs/data-table/columns";
+import { DataTable } from "~/components/vehicles/data-table/data-table";
+import { columns } from "~/components/vehicles/data-table/columns";
 import { api } from "~/trpc/server";
-import { Button } from "~/components/ui/button";
+import { VehicleDialog } from "~/components/vehicle-dialog"; // Import the new client component
 
 export default async function MyVehiclesPage() {
   const session = await auth();
@@ -13,19 +13,21 @@ export default async function MyVehiclesPage() {
   }
 
   // Fetch entry logs using the tRPC getMyVehicles route
-  const entryLogs = await api.vehicle.getMyVehicles();
+  const vehicles = await api.vehicle.getMyVehicles();
 
   // // Calculate pagination values based on your needs
-  const totalEntries = entryLogs.length;
+  const totalVehicles = vehicles.length;
   const perPage = 10; // Adjust as needed
-  const pageCount = Math.ceil(totalEntries / perPage);
+  const pageCount = Math.ceil(totalVehicles / perPage);
+
+  console.log(vehicles);
 
   return (
     <ContentSection title="My Vehicles" desc="Here are your list of vehicles.">
       <div className="flex-1 overflow-auto py-1 lg:flex-row lg:space-y-0 lg:space-x-12">
-        <Button>Add Vehicle</Button>
+        {totalVehicles < 2 && <VehicleDialog />}
         <DataTable
-          data={[]}
+          data={vehicles}
           columns={columns}
           pageCount={pageCount}
           currentPage={1}

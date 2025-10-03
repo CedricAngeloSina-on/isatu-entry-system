@@ -1,50 +1,28 @@
 "use client";
 import { DataTableColumnHeader } from "~/components/entry-logs/data-table/data-table-column-header";
 import { type ColumnDef } from "@tanstack/react-table";
-import { format } from "date-fns";
 
-export interface EntryLog {
+export interface Vehicle {
   id: number;
-  idNumber: string;
-  plateNumber: string;
+  vehicleColor: string;
   vehicleType: string;
-  timestamp: Date;
+  plateNumber: string;
 }
 
-export const columns: ColumnDef<EntryLog>[] = [
+export const columns: ColumnDef<Vehicle>[] = [
   {
     id: "id",
-  },
-  {
-    accessorKey: "name",
+    accessorKey: "id",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Name" />
+      <DataTableColumnHeader column={column} title="ID" />
     ),
   },
   {
-    accessorKey: "idNumber",
+    accessorKey: "vehicleColor",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="ID Number" />
+      <DataTableColumnHeader column={column} title="Vehicle Color" />
     ),
   },
-  {
-    accessorKey: "college",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="College" />
-    ),
-  },
-  {
-    accessorKey: "plateNumber",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Plate Number" />
-    ),
-  },
-  //   {
-  //     accessorKey: "role",
-  //     header: ({ column }) => (
-  //       <DataTableColumnHeader column={column} title="Role" />
-  //     ),
-  //   },
   {
     accessorKey: "vehicleType",
     header: ({ column }) => (
@@ -52,15 +30,9 @@ export const columns: ColumnDef<EntryLog>[] = [
     ),
   },
   {
-    accessorKey: "timestamp",
+    accessorKey: "plateNumber",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Timestamp" />
+      <DataTableColumnHeader column={column} title="Plate Number" />
     ),
-    cell: ({ row }) => {
-      const value = row.original.timestamp;
-      if (!value) return null;
-
-      return format(value, "MMMM dd, yyyy hh:mm a");
-    },
   },
 ];
