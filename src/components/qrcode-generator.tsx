@@ -5,12 +5,10 @@ import QRCode from "qrcode";
 import Image from "next/image";
 
 interface QRCodeGeneratorProps {
-  uuid?: string;
+  qrURL?: string;
 }
 
-const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
-  uuid = "1f5700a4-18cc-45d8-9823-21f60459cef9",
-}) => {
+const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ qrURL = "" }) => {
   const [qrCodeUrl, setQrCodeUrl] = useState<string>("");
   const [error, setError] = useState<string>("");
 
@@ -18,7 +16,7 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
     const generateQRCode = async () => {
       try {
         // Generate QR code as data URL
-        const url = await QRCode.toDataURL(uuid, {
+        const url = await QRCode.toDataURL(qrURL, {
           width: 256,
           margin: 2,
         });
@@ -29,10 +27,10 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
       }
     };
 
-    if (uuid) {
+    if (qrURL) {
       void generateQRCode();
     }
-  }, [uuid]);
+  }, [qrURL]);
 
   if (error) {
     return <div className="text-red-500">Error: {error}</div>;
@@ -44,7 +42,7 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({
         <div className="size-48 border-4">
           <Image
             src={qrCodeUrl}
-            alt={`QR Code for UUID: ${uuid}`}
+            alt={`QR Code for UUID: ${qrURL}`}
             className="block w-full"
             width="192"
             height={192}

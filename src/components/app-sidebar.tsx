@@ -1,4 +1,5 @@
 import * as React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { CarFront, GalleryVerticalEnd, List, Scan, User } from "lucide-react";
 
@@ -63,8 +64,14 @@ export function AppSidebar({ isAdmin, ...props }: AppSidebarProps) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <a href="/profile">
-                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <GalleryVerticalEnd className="size-4" />
+                <div className="text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                  <Image
+                    src="/logo.png" // Replace with your logo path
+                    alt="Logo"
+                    width={30}
+                    height={30}
+                    className="size-8 rounded-sm"
+                  />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
                   <span className="font-medium">ISAT-U Entry System</span>

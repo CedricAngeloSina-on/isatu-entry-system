@@ -20,8 +20,6 @@ export default async function MyVehiclesPage() {
   const perPage = 10; // Adjust as needed
   const pageCount = Math.ceil(totalVehicles / perPage);
 
-  console.log(vehicles);
-
   return (
     <ContentSection title="My Vehicles" desc="Here are your list of vehicles.">
       <div className="flex-1 overflow-auto py-1 lg:flex-row lg:space-y-0 lg:space-x-12">
@@ -31,7 +29,7 @@ export default async function MyVehiclesPage() {
           columns={columns}
           pageCount={pageCount}
           currentPage={1}
-          perPage={10}
+          perPage={perPage}
         />
       </div>
     </ContentSection>

@@ -32,6 +32,7 @@ export const vehicleRouter = createTRPCRouter({
     const myVehicles = await ctx.db
       .select({
         id: vehicles.id,
+        user_id: sql<string>`COALESCE(UPPER(${vehicles.user_id}), '')`,
         vehicleColor: sql<string>`COALESCE(UPPER(${vehicles.vehicleColor}), '')`,
         vehicleType: sql<string>`COALESCE(UPPER(${vehicles.vehicleType}), '')`,
         plateNumber: sql<string>`COALESCE(${vehicles.plateNumber}, '')`,

@@ -5,6 +5,7 @@ import { Label } from "~/components/ui/label";
 import { Input } from "~/components/ui/input";
 import { ContentSection } from "~/components/content-section";
 import Image from "next/image";
+import { api } from "~/trpc/server";
 
 export default async function ProfilePage() {
   const session = await auth();
@@ -12,56 +13,101 @@ export default async function ProfilePage() {
     redirect("/");
   }
 
+  // Fetch entry logs using the tRPC getMyProfile route
+  const vehicles = await api.vehicle.getMyVehicles();
+
   return (
     <ContentSection title="Profile" desc="Here are your basic account details">
-      <div className="flex-1 overflow-auto py-1 lg:flex-row">
-        <div className="w-full">
-          {/* ID Card Container */}
-          <div className="flex flex-col lg:flex-row">
-            {/* Left side - Form fields */}
-            <div className="grid grid-cols-1 gap-4">
-              {/* Name */}
-              <div className="lg:w-[300px]">
-                <Label className="flex-shrink-0 text-lg">Name:</Label>
-                <Input value={session.user.name!} disabled />
-              </div>
+      <div className="flex w-full flex-col items-center gap-6 py-4 lg:flex-row">
+        {/* ---------------- FRONT OF ID ---------------- */}
+        <div className="relative aspect-[27/17] w-[480px] max-w-full overflow-hidden rounded-lg border border-gray-400 bg-white shadow-md">
+          {/* ---- HEADER (Inside Front ID) ---- */}
+          <div className="absolute top-0 right-0 left-0 flex h-[15%] items-center justify-between bg-blue-700 px-4 text-white">
+            <div className="flex items-center gap-2">
+              <Image
+                src="/logo.png" // Replace with your logo path
+                alt="Logo"
+                width={30}
+                height={30}
+                className="rounded-sm"
+              />
+              <h2 className="text-sm font-semibold">
+                Iloilo Science and Technology University
+              </h2>
+            </div>
+            <span className="text-[10px] opacity-90">Vehicle Pass</span>
+          </div>
 
-              {/* ID Number */}
-              <div className="lg:w-[300px]">
-                <Label className="flex-shrink-0 text-lg">ID Number:</Label>
-                <Input value={session.user.idNumber!} disabled />
-              </div>
-
-              {/* College */}
-              <div className="lg:w-[300px]">
-                <Label className="flex-shrink-0 text-lg">College:</Label>
-                <Input value={session.user.college!} disabled />
-              </div>
-
-              {/* Email */}
-              <div className="lg:w-[300px]">
-                <Label className="flex-shrink-0 text-lg">Email:</Label>
-                <Input value={session.user.email!} disabled />
+          {/* ---- Main Content ---- */}
+          <div className="absolute inset-0 grid grid-cols-2 gap-2 p-3 pt-12 text-xs">
+            {/* Left: Photo */}
+            <div className="flex flex-col items-center justify-center">
+              <div className="relative h-56 w-44 rounded border border-gray-300 shadow-sm">
+                <Image
+                  src={session.user.image ?? ""}
+                  alt="Profile photo"
+                  fill
+                  className="rounded object-cover"
+                />
               </div>
             </div>
 
-            {/* Right side - Picture and QR */}
-            <div className="ml-4 w-48 space-y-4">
-              {/* Picture placeholder */}
-              <div className="relative flex h-48 w-full items-center justify-center rounded-lg border-2 border-black bg-gray-50">
-                <Image
-                  src={session.user.image!}
-                  alt={""}
-                  layout="fill"
-                  objectFit="cover"
-                  className="rounded-lg" // Optional: apply rounded corners to the image itself
+            {/* Right: Info fields */}
+            <div className="flex flex-col justify-center space-y-1">
+              <div className="pt-2">
+                <Label className="text-xs font-semibold">Name</Label>
+                <Input
+                  value={session.user.name ?? ""}
+                  disabled
+                  className="h-6 text-xs"
                 />
               </div>
-
-              {/* QR Code */}
-              <div className="h-48 w-full">
-                <QRCodeGenerator uuid={session.user.id} />
+              <div className="pt-2">
+                <Label className="text-xs font-semibold">ID Number</Label>
+                <Input
+                  value={session.user.idNumber ?? ""}
+                  disabled
+                  className="h-6 text-xs"
+                />
               </div>
+              <div className="pt-2">
+                <Label className="text-xs font-semibold">College</Label>
+                <Input
+                  value={session.user.college ?? ""}
+                  disabled
+                  className="h-6 text-xs"
+                />
+              </div>
+              <div className="pt-2">
+                <Label className="text-xs font-semibold">Email</Label>
+                <Input
+                  value={session.user.email ?? ""}
+                  disabled
+                  className="h-6 text-xs"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ---------------- BACK OF ID ---------------- */}
+        <div className="relative aspect-[27/17] w-[480px] max-w-full overflow-hidden rounded-lg border border-gray-400 bg-white shadow-md">
+          {/* ---- HEADER (Same as front header) ---- */}
+          <div className="absolute top-0 right-0 left-0 flex h-[15%] items-center justify-between bg-blue-700 px-4 text-white">
+            <p className="text-sm font-semibold">Scan for Verification</p>
+          </div>
+
+          {/* ---- Main Content ---- */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 p-4 pt-12">
+            <div className="flex justify-center gap-x-8">
+              {vehicles?.map((vehicle) => (
+                <div key={vehicle.id} className="flex flex-col items-center">
+                  <QRCodeGenerator
+                    qrURL={`user_id=${vehicle.user_id}&plateNumber=${vehicle.plateNumber}`}
+                  />
+                  <span className="mt-1 text-sm">{vehicle.plateNumber}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
