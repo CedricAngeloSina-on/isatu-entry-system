@@ -28,8 +28,13 @@ export function QRScanner() {
         const qrResult = result[0] as QRResult;
         const qrData = qrResult.rawValue;
 
+        const params = new URLSearchParams(qrData);
+        const input_user_id = params.get("user_id");
+        const input_plateNumber = params.get("plateNumber");
+
         createEntry.mutate({
-          user_id: qrData,
+          user_id: String(input_user_id),
+          plateNumber: String(input_plateNumber),
         });
       } else {
         console.warn("No QR code data found");

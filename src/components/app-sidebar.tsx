@@ -1,7 +1,7 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { CarFront, GalleryVerticalEnd, List, Scan, User } from "lucide-react";
+import { CarFront, List, Scan, User } from "lucide-react";
 
 import {
   Sidebar,

@@ -1,37 +1,43 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { entry_logs, users, vehicles } from "~/server/db/schema";
-import { eq, desc, sql } from "drizzle-orm";
+import { and, eq, desc, sql } from "drizzle-orm";
 
 export const entryLogRouter = createTRPCRouter({
-  // create: publicProcedure
-  //   .input(
-  //     z.object({
-  //       vehicle_id: z.string().uuid(),
-  //     }),
-  //   )
-  //   .mutation(async ({ ctx, input }) => {
-  //     try {
-  //       const vehicle = await ctx.db
-  //         .select()
-  //         .from(vehicles)
-  //         .where(eq(vehicles.id, Number(input.vehicle_id)))
-  //         .limit(1);
+  create: publicProcedure
+    .input(
+      z.object({
+        user_id: z.string(),
+        plateNumber: z.string(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const vehicle = await ctx.db
+          .select()
+          .from(vehicles)
+          .where(
+            and(
+              eq(vehicles.user_id, String(input.user_id)),
+              eq(vehicles.plateNumber, input.plateNumber),
+            ),
+          )
+          .limit(1);
 
-  //       if (vehicle.length === 0) {
-  //         return; // or throw new Error("Student not found")
-  //       }
+        if (vehicle.length === 0) {
+          return; // or throw new Error("Student not found")
+        }
 
-  //       const result = await ctx.db.insert(entry_logs).values({
-  //         vehicle_id: String(vehicle[0]?.id),
-  //       });
+        const result = await ctx.db.insert(entry_logs).values({
+          vehicle_id: Number(vehicle[0]?.id),
+        });
 
-  //       return result;
-  //     } catch (error) {
-  //       console.error("Error logging entry:", error);
-  //       throw new Error("Failed to log entry");
-  //     }
-  //   }),
+        return result;
+      } catch (error) {
+        console.error("Error logging entry:", error);
+        throw new Error("Failed to log entry");
+      }
+    }),
 
   getAllEntries: publicProcedure.query(async ({ ctx }) => {
     const entries = await ctx.db
