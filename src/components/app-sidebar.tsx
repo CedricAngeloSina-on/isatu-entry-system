@@ -58,7 +58,7 @@ export function AppSidebar({ isAdmin, ...props }: AppSidebarProps) {
   ];
 
   return (
-    <Sidebar {...props}>
+    <Sidebar {...props} className="print:hidden">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
