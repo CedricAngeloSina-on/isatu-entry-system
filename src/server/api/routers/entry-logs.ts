@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { entry_logs, users, vehicles } from "~/server/db/schema";
-import { and, eq, desc, sql } from "drizzle-orm";
+import { ilike, and, eq, desc, sql } from "drizzle-orm";
 
 export const entryLogRouter = createTRPCRouter({
   create: publicProcedure
@@ -18,8 +18,8 @@ export const entryLogRouter = createTRPCRouter({
           .from(vehicles)
           .where(
             and(
-              eq(vehicles.user_id, String(input.user_id)),
-              eq(vehicles.plateNumber, input.plateNumber),
+              ilike(vehicles.user_id, String(input.user_id)),
+              ilike(vehicles.plateNumber, input.plateNumber),
             ),
           )
           .limit(1);
@@ -27,6 +27,8 @@ export const entryLogRouter = createTRPCRouter({
         if (vehicle.length === 0) {
           return; // or throw new Error("Student not found")
         }
+
+        console.log(vehicle);
 
         const result = await ctx.db.insert(entry_logs).values({
           vehicle_id: Number(vehicle[0]?.id),
