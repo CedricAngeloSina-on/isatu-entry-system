@@ -48,8 +48,8 @@ export const entryLogRouter = createTRPCRouter({
         name: sql<string>`COALESCE(${users.name}, '')`,
         idNumber: sql<string>`COALESCE(${users.idNumber}, '')`,
         college: sql<string>`COALESCE(${users.college}, '')`,
-        plateNumber: sql<string>`COALESCE(${vehicles.plateNumber}, '')`,
-        vehicleType: sql<string>`COALESCE(${vehicles.vehicleType}, '')`,
+        plateNumber: sql<string>`COALESCE(UPPER(${vehicles.plateNumber}), '')`,
+        vehicleType: sql<string>`COALESCE(UPPER(${vehicles.vehicleType}), '')`,
         timestamp: entry_logs.timestamp,
       })
       .from(entry_logs)
@@ -67,8 +67,8 @@ export const entryLogRouter = createTRPCRouter({
         name: sql<string>`COALESCE(${users.name}, '')`,
         idNumber: sql<string>`COALESCE(${users.idNumber}, '')`,
         college: sql<string>`COALESCE(${users.college}, '')`,
-        plateNumber: sql<string>`COALESCE(${vehicles.plateNumber}, '')`,
-        vehicleType: sql<string>`COALESCE(${vehicles.vehicleType}, '')`,
+        plateNumber: sql<string>`COALESCE(UPPER(${vehicles.plateNumber}), '')`,
+        vehicleType: sql<string>`COALESCE(UPPER(${vehicles.vehicleType}), '')`,
         timestamp: entry_logs.timestamp,
       })
       .from(entry_logs)

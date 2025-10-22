@@ -108,7 +108,7 @@ export function LoginForm() {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
-        <div className="flex flex-col gap-2">
+        <div className="flex-col gap-2">
           <h1 className="text-2xl font-bold">Login to your account</h1>
           <p className="text-muted-foreground text-sm text-balance">
             Enter your email and password below to login to your account

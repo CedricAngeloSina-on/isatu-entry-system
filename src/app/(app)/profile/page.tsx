@@ -19,16 +19,13 @@ export default async function ProfilePage() {
   return (
     <ContentSection title="Profile" desc="Here are your basic account details">
       <>
-        <div className="mb-4 flex justify-end">
-          <PrintButton />
-        </div>
-
+        <PrintButton />
         <div
           id="id-cards"
           className="flex w-full flex-col items-center gap-6 py-4 lg:flex-row"
         >
           {/* ---------------- FRONT OF ID ---------------- */}
-          <div className="relative aspect-[27/17] w-[480px] max-w-full overflow-hidden rounded-lg border border-gray-400 bg-white shadow-md">
+          <div className="relative aspect-[27/17] w-[480px] max-w-full overflow-hidden rounded-lg border bg-white shadow-md">
             {/* ---- HEADER (Inside Front ID) ---- */}
             <div className="absolute top-0 right-0 left-0 flex h-[15%] items-center justify-between bg-blue-700 px-4 text-white">
               <div className="flex items-center gap-2">
@@ -50,7 +47,7 @@ export default async function ProfilePage() {
             <div className="absolute inset-0 grid grid-cols-2 gap-2 p-3 pt-12 text-xs">
               {/* Left: Photo */}
               <div className="flex flex-col items-center justify-center">
-                <div className="relative h-56 w-44 rounded border border-gray-300 shadow-sm">
+                <div className="relative h-56 w-44 rounded border shadow-sm">
                   <Image
                     src={session.user.image ?? ""}
                     alt="Profile photo"
@@ -99,7 +96,7 @@ export default async function ProfilePage() {
           </div>
 
           {/* ---------------- BACK OF ID ---------------- */}
-          <div className="relative aspect-[27/17] w-[480px] max-w-full overflow-hidden rounded-lg border border-gray-400 bg-white shadow-md">
+          <div className="relative aspect-[27/17] w-[480px] max-w-full overflow-hidden rounded-lg border bg-white shadow-md">
             {/* ---- HEADER (Same as front header) ---- */}
             <div className="absolute top-0 right-0 left-0 flex h-[15%] items-center justify-between bg-blue-700 px-4 text-white">
               <p className="text-sm font-semibold">Scan for Verification</p>
