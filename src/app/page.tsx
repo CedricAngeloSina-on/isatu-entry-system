@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { auth } from "~/server/auth";
 import { redirect } from "next/navigation";
 
