@@ -8,12 +8,7 @@ type ContentSectionProps = {
 
 export function ContentSection({ title, desc, children }: ContentSectionProps) {
   return (
-    <div
-      className="min-h-[calc(100vh-4rem)] bg-[length:calc(100vh-4rem)] bg-right bg-no-repeat p-6"
-      style={{
-        backgroundImage: "url('/logo_bg.png')",
-      }}
-    >
+    <div className="min-h-[calc(100vh-4rem)] bg-[url('/logo_bg.png')] bg-[length:calc(100vh-4rem)] bg-right bg-no-repeat p-6 print:bg-none">
       <div className="px-4 py-6">
         <div className="mb-2 flex flex-wrap items-center justify-between space-y-2">
           <div>

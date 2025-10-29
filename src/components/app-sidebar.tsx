@@ -34,8 +34,13 @@ export function AppSidebar({ isAdmin, ...props }: AppSidebarProps) {
     ...(isAdmin == "admin"
       ? [
           {
-            title: "All Entry Logs",
+            title: "University Entry Logs",
             url: "/entry-logs",
+            icon: List,
+          },
+          {
+            title: "Visitor Entry Logs",
+            url: "/visitor-entry-logs",
             icon: List,
           },
         ]
@@ -53,8 +58,13 @@ export function AppSidebar({ isAdmin, ...props }: AppSidebarProps) {
     ...(isAdmin == "admin"
       ? [
           {
-            title: "QR Scanner",
+            title: "University QR Scanner",
             url: "/qr-scanner",
+            icon: Scan,
+          },
+          {
+            title: "Visitor QR Scanner",
+            url: "/visitor-qr-scanner",
             icon: Scan,
           },
         ]

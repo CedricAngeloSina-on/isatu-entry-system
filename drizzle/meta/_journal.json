@@ -8,6 +8,13 @@
       "when": 1759388536140,
       "tag": "0000_unusual_fallen_one",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1761719080718,
+      "tag": "0001_minor_red_skull",
+      "breakpoints": true
     }
   ]
 }

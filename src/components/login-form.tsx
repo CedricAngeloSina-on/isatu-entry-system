@@ -149,9 +149,14 @@ export function LoginForm() {
           {isSubmitting ? "Logging in..." : "Login"}
         </Button>
         <div className="text-center text-sm">
-          Don&apos;t have an account?{" "}
+          Don&apos;t have an account?
+          <br />
           <Link href="/register" className="underline underline-offset-4">
-            Register
+            Register as Student/Personnel
+          </Link>{" "}
+          or as a{" "}
+          <Link href="/visitor" className="underline underline-offset-4">
+            Visitor
           </Link>
         </div>
       </form>

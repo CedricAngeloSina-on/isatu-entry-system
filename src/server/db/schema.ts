@@ -92,6 +92,15 @@ export const entry_logs = pgTable("entry_logs", {
   timestamp: timestamp("timestamp", { mode: "date" }).notNull().defaultNow(),
 });
 
+export const visitor_entry_logs = pgTable("visitor_entry_logs", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }),
+  vehicleType: varchar("vehicleType", { length: 255 }).notNull(),
+  vehicleColor: varchar("vehicleColor", { length: 255 }).notNull(),
+  plateNumber: varchar("plateNumber", { length: 255 }).notNull(),
+  timestamp: timestamp("timestamp", { mode: "date" }).notNull().defaultNow(),
+});
+
 export const vehicles = pgTable("vehicles", {
   id: serial("id").primaryKey(),
   user_id: varchar("user_id", { length: 255 })

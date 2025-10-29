@@ -8,8 +8,8 @@ type QRResult = {
   [key: string]: unknown; // allow other properties without strict typing
 };
 
-export function QRScanner() {
-  const createEntry = api.entryLog.create.useMutation({
+export function VisitorQRScanner() {
+  const createEntry = api.visitorEntryLog.create.useMutation({
     onSuccess: () => {
       console.log("Entry logged successfully");
       toast.success("Scanned Successfully");
@@ -30,11 +30,15 @@ export function QRScanner() {
         const qrData = qrResult.rawValue;
 
         const params = new URLSearchParams(qrData);
-        const input_user_id = params.get("user_id");
+        const input_name = params.get("name");
+        const input_vehicleColor = params.get("vehicleColor");
+        const input_vehicleType = params.get("vehicleType");
         const input_plateNumber = params.get("plateNumber");
 
         createEntry.mutate({
-          user_id: String(input_user_id),
+          name: String(input_name),
+          vehicleColor: String(input_vehicleColor),
+          vehicleType: String(input_vehicleType),
           plateNumber: String(input_plateNumber),
         });
       } else {
