@@ -16,11 +16,10 @@ import {
   type VisibilityState,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
-  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 import { useEffect, useState } from "react";
+import { DataTablePagination } from "./data-table-pagination";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -28,6 +27,8 @@ interface DataTableProps<TData, TValue> {
   pageCount: number;
   currentPage: number;
   perPage: number;
+  onPageChange: (page: number) => void;
+  onPerPageChange: (perPage: number) => void;
 }
 
 export function DataTable<TData extends EntryLog, TValue>({
@@ -36,6 +37,8 @@ export function DataTable<TData extends EntryLog, TValue>({
   pageCount,
   currentPage,
   perPage,
+  onPageChange,
+  onPerPageChange,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = useState({});
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -57,7 +60,7 @@ export function DataTable<TData extends EntryLog, TValue>({
       rowSelection,
       columnFilters,
       pagination: {
-        pageIndex: currentPage - 1, // Convert 1-based to 0-based indexing
+        pageIndex: currentPage - 1,
         pageSize: perPage,
       },
     },
@@ -67,15 +70,11 @@ export function DataTable<TData extends EntryLog, TValue>({
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    manualPagination: true, // Tell the table we're doing server-side pagination
-    manualFiltering: true, // Tell the table we're doing server-side filtering
-    manualSorting: true, // Tell the table we're doing server-side sorting
+    manualPagination: true,
   });
 
   return (
-    <div className="w-full space-y-2">
+    <div className="flex flex-col gap-4">
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -137,6 +136,11 @@ export function DataTable<TData extends EntryLog, TValue>({
           </TableBody>
         </Table>
       </div>
+      <DataTablePagination
+        table={table}
+        onPageChange={onPageChange}
+        onPerPageChange={onPerPageChange}
+      />
     </div>
   );
 }
